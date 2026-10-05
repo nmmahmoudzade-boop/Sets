@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#F8FAFF">
+<title>اشتراک، اجتماع و تفاضل مجموعه‌ها</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F8FAFF; --grid:#E3E9FA; --ink:#34325A; --muted:#6C6A8F;
+  --mint:#C6EFE0; --mint-d:#2B8A6E; --mint-s:#9ADDBF;
+  --peach:#FFD9CB; --peach-d:#C0603F;
+  --sky:#CDE6FB; --sky-d:#2D6CA3;
+  --lav:#DCD4F8; --lav-d:#6B58B5;
+  --butter:#FFF1BF; --rose:#FBD3E3; --rose-d:#B84A7B;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;min-height:100vh;color:var(--ink);
+  font-family:'Vazirmatn','Vazir',Tahoma,'Segoe UI',sans-serif;font-size:17px;line-height:1.95;
+  background-color:var(--paper);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:34px 34px;
+}
+.math{font-family:'STIX Two Text','Cambria Math','Times New Roman',serif;unicode-bidi:isolate;white-space:nowrap;font-size:1.1em}
+button{font-family:inherit}
+:focus-visible{outline:3px solid var(--lav-d);outline-offset:3px;border-radius:10px}
+.screen{display:none}
+.screen.active{display:block}
+
+/* ---------- intro ---------- */
+#intro{position:relative;overflow:hidden}
+.symbols span{position:absolute;font-family:'STIX Two Text','Cambria Math','Times New Roman',serif;color:var(--lav-d);opacity:.2;pointer-events:none;user-select:none}
+.hero{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:34px 20px;text-align:center}
+.hero-venn{width:min(520px,92vw);height:auto;overflow:visible}
+.hv-a{animation:slideA 1.3s cubic-bezier(.2,.8,.25,1) both}
+.hv-b{animation:slideB 1.3s cubic-bezier(.2,.8,.25,1) both}
+.hv-i{opacity:0;transform-box:fill-box;transform-origin:center;animation:pop .6s 1.1s cubic-bezier(.3,1.6,.5,1) forwards}
+@keyframes slideA{from{transform:translateX(-80px)}to{transform:none}}
+@keyframes slideB{from{transform:translateX(80px)}to{transform:none}}
+@keyframes pop{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
+.hero h1{margin:8px 0 4px;font-size:clamp(2rem,6.4vw,3.5rem);font-weight:800;line-height:1.4}
+.hero .sub{margin:0;color:var(--muted);font-size:1.1rem}
+.designer{margin:26px 0 28px;padding:12px 30px;background:var(--butter);border:2px solid #F0DC93;border-radius:999px;line-height:1.7}
+.designer strong{font-size:1.2rem;font-weight:800}
+.designer small{display:block;color:var(--muted);font-size:.95rem}
+.btn{font-size:1.05rem;font-weight:700;border:2px solid;border-radius:999px;padding:10px 30px;cursor:pointer;color:var(--ink);transition:transform .15s,background .15s}
+.btn:hover{transform:translateY(-2px)}
+.btn.primary{background:var(--mint);border-color:var(--mint-d)}
+.btn.soft{background:#fff;border-color:#CFCBEA}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+
+/* ---------- app ---------- */
+.topbar{position:sticky;top:0;z-index:10;background:rgba(248,250,255,.93);backdrop-filter:blur(8px);border-bottom:2px solid #E0DDF4}
+.topbar-in{max-width:960px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:14px}
+.brand{font-weight:800;white-space:nowrap}
+.tabs{display:flex;gap:8px;overflow-x:auto;padding:4px 2px;flex:1}
+.tab{--c:#fff;--cd:#CFCBEA;display:inline-flex;align-items:center;gap:8px;white-space:nowrap;padding:5px 16px;border-radius:999px;border:2px solid #E0DDF4;background:#fff;color:var(--ink);cursor:pointer;font-size:.98rem}
+.tab .math{font-size:1.2em;font-weight:700}
+.tab[data-tab=inter]{--c:var(--mint);--cd:var(--mint-d)}
+.tab[data-tab=union]{--c:var(--peach);--cd:var(--peach-d)}
+.tab[data-tab=diff]{--c:var(--sky);--cd:var(--sky-d)}
+.tab[data-tab=quiz]{--c:var(--lav);--cd:var(--lav-d)}
+.tab.active{background:var(--c);border-color:var(--cd);font-weight:700}
+main{max-width:900px;margin:0 auto;padding:10px 16px 40px}
+.panel{display:none}
+.panel.active{display:block}
+.op-head{display:flex;align-items:center;gap:16px;margin:22px 0 4px}
+.badge{flex:none;width:68px;height:68px;border-radius:50%;display:grid;place-items:center;font-size:2.2rem;border:3px solid;font-family:'STIX Two Text','Cambria Math','Times New Roman',serif}
+.op-head h2{margin:0;font-size:1.7rem;font-weight:800;line-height:1.5}
+.card{border-radius:22px;padding:18px 22px;margin:18px 0;border:2px solid}
+.card h3{margin:0 0 6px;font-size:1.12rem;font-weight:800}
+.card p{margin:6px 0}
+.c-def{background:#FFF6D6;border-color:#F0DC93}
+.c-math{background:#EFEBFD;border-color:#CBBFF2}
+.c-play{background:#fff;border-color:#BFE6D6}
+.c-laws{background:#FDEAF2;border-color:#F3C3D8}
+.c-ex{background:#E8F3FD;border-color:#BBD9F2}
+.mathline{direction:ltr;text-align:center;overflow-x:auto;padding:12px 6px;margin:8px 0;background:#fff;border:2px dashed #CBBFF2;border-radius:16px;font-family:'STIX Two Text','Cambria Math','Times New Roman',serif;font-size:1.5rem}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:10px;color:var(--muted);font-size:.95rem}
+.legend b{font-weight:500;color:var(--ink)}
+.chips-row{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.pill{border:2px solid #CFE8DD;background:#F3FBF7;border-radius:999px;padding:3px 16px;cursor:pointer;font-size:.95rem;color:var(--ink)}
+.pill.active{background:var(--mint);border-color:var(--mint-d);font-weight:700}
+.venn-wrap{max-width:560px;margin:10px auto}
+.venn-wrap svg{width:100%;height:auto;display:block}
+.setrow{display:flex;flex-wrap:wrap;gap:8px 10px;margin:8px 0;justify-content:center}
+.setbox{background:#fff;border:2px solid #E0DDF4;border-radius:14px;padding:0 14px;direction:ltr}
+.result{margin:8px 0;padding:10px 12px;text-align:center;border-radius:16px;background:var(--mint);border:2px solid var(--mint-s);font-family:'STIX Two Text','Cambria Math','Times New Roman',serif;font-size:1.55rem;direction:ltr}
+.note{margin:8px 2px 0;color:var(--ink)}
+.note p{margin:4px 0}
+ul.laws{list-style:none;margin:6px 0 0;padding:0}
+ul.laws li{padding:7px 0;border-bottom:1.5px dashed #F0BFD6;display:flex;gap:12px;flex-wrap:wrap;align-items:baseline;justify-content:space-between}
+ul.laws li:last-child{border-bottom:0}
+ul.laws .lbl{flex:1 1 200px}
+ul.laws .eq{direction:ltr;font-size:1.2rem}
+.ex{margin:10px 0 16px;padding-bottom:6px}
+.ex + .ex{border-top:2px dashed #BBD9F2;padding-top:14px}
+.problem{background:#fff;border-radius:14px;padding:8px 16px;margin:8px 0;border:2px solid #D7E8F8}
+ol.steps{list-style:none;counter-reset:s;margin:8px 0 0;padding:0}
+ol.steps li{counter-increment:s;position:relative;padding:4px 46px 4px 0;margin:6px 0}
+ol.steps li::before{content:counter(s,persian);position:absolute;right:0;top:6px;width:32px;height:32px;border-radius:50%;background:var(--sky);border:2px solid var(--sky-d);display:grid;place-items:center;font-size:.9rem;font-weight:700;line-height:1}
+.chip{display:inline-block;min-width:2.4em;text-align:center;padding:0 10px;margin:2px 3px;border-radius:12px;border:1.5px solid;font-family:'STIX Two Text','Cambria Math','Times New Roman',serif;direction:ltr}
+.chip.yes{background:var(--mint);border-color:var(--mint-d)}
+.chip.no{background:var(--rose);border-color:var(--rose-d)}
+.pager{display:flex;justify-content:space-between;gap:10px;margin:26px 0 6px}
+footer{text-align:center;color:var(--muted);padding:6px 16px 28px;font-size:.95rem}
+
+/* ---------- quiz ---------- */
+.q-card{background:#fff;border:2px solid #CBBFF2;border-radius:22px;padding:18px 22px;margin:18px 0}
+.progress{height:12px;background:#E9E5FA;border-radius:999px;overflow:hidden;margin:6px 0 4px}
+.progress i{display:block;height:100%;background:var(--lav-d);border-radius:999px;transition:width .4s}
+.q-meta{display:flex;justify-content:space-between;color:var(--muted);font-size:.95rem}
+.q-text{font-size:1.12rem;font-weight:500;margin:14px 0 6px}
+.opt{display:flex;align-items:center;gap:12px;width:100%;text-align:right;padding:10px 14px;margin:9px 0;background:#fff;border:2px solid #DDD8F3;border-radius:16px;font-size:1.05rem;color:var(--ink);cursor:pointer;transition:background .15s,border-color .15s}
+.opt:hover:not(:disabled){background:#F6F3FF}
+.opt .lt{flex:none;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--lav);font-weight:700;font-size:.9rem}
+.opt.sel{border-color:var(--lav-d);background:#F1EDFF}
+.opt.correct{background:var(--mint);border-color:var(--mint-d)}
+.opt.wrong{background:var(--rose);border-color:var(--rose-d)}
+.opt .tag{margin-inline-start:auto;font-size:.88rem;font-weight:700}
+.opt:disabled{cursor:default}
+.feedback{margin-top:12px;padding:12px 16px;border-radius:16px;border:2px solid}
+.feedback.ok{background:#E6F8EF;border-color:var(--mint-d)}
+.feedback.bad{background:#FFEAF2;border-color:var(--rose-d)}
+.feedback .ans{margin:4px 0}
+.score-big{font-size:3rem;font-weight:800;text-align:center;line-height:1.4}
+.review{list-style:none;padding:0;margin:10px 0}
+.review li{padding:8px 12px;margin:8px 0;border-radius:14px;border:2px solid}
+.review li.r-ok{background:#E6F8EF;border-color:var(--mint-s)}
+.review li.r-bad{background:#FFEAF2;border-color:#F3C3D8}
+
+@media (max-width:560px){
+  body{font-size:16px}
+  .brand{display:none}
+  .badge{width:56px;height:56px;font-size:1.8rem}
+  .op-head h2{font-size:1.35rem}
+  .mathline{font-size:1.15rem}
+  .card,.q-card{padding:16px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  .hv-i{opacity:1}
+  html{scroll-behavior:auto}
+}
+@counter-style persian{system:numeric;symbols:'۰' '۱' '۲' '۳' '۴' '۵' '۶' '۷' '۸' '۹'}
+</style>
+</head>
+<body>
+
+<!-- ================= صفحه اول ================= -->
+<section id="intro" class="screen active">
+  <div class="symbols" aria-hidden="true">
+    <span style="top:6%;right:8%;font-size:4rem">∈</span>
+    <span style="top:12%;left:7%;font-size:5rem">∪</span>
+    <span style="top:34%;right:3%;font-size:3rem">∅</span>
+    <span style="top:44%;left:3%;font-size:3.6rem">⊂</span>
+    <span style="top:68%;right:9%;font-size:5rem">∩</span>
+    <span style="top:78%;left:8%;font-size:4rem">∉</span>
+    <span style="top:90%;right:36%;font-size:3rem">{ }</span>
+    <span style="top:4%;left:42%;font-size:2.6rem">ℕ</span>
+    <span style="top:58%;left:40%;font-size:2.4rem;opacity:.12">−</span>
+  </div>
+  <div class="hero">
+    <svg class="hero-venn" viewBox="0 0 420 250" aria-hidden="true">
+      <defs>
+        <clipPath id="hcA"><circle cx="150" cy="125" r="95"/></clipPath>
+        <clipPath id="hcB"><circle cx="270" cy="125" r="95"/></clipPath>
+      </defs>
+      <g class="hv-a">
+        <circle cx="150" cy="125" r="95" fill="#FFD9CB" fill-opacity=".8" stroke="#E0906F" stroke-width="3"/>
+        <text x="100" y="135" text-anchor="middle" font-size="46" font-family="'STIX Two Text','Times New Roman',serif" font-style="italic" fill="#C0603F">A</text>
+      </g>
+      <g class="hv-b">
+        <circle cx="270" cy="125" r="95" fill="#CDE6FB" fill-opacity=".8" stroke="#6AA7DB" stroke-width="3"/>
+        <text x="322" y="135" text-anchor="middle" font-size="46" font-family="'STIX Two Text','Times New Roman',serif" font-style="italic" fill="#2D6CA3">B</text>
+      </g>
+      <g class="hv-i">
+        <circle cx="270" cy="125" r="95" clip-path="url(#hcA)" fill="#9ADDBF"/>
+        <circle cx="150" cy="125" r="95" clip-path="url(#hcB)" fill="none" stroke="#E0906F" stroke-width="3"/>
+        <circle cx="270" cy="125" r="95" clip-path="url(#hcA)" fill="none" stroke="#6AA7DB" stroke-width="3"/>
+        <text x="210" y="142" text-anchor="middle" font-size="46" font-family="'STIX Two Text','Times New Roman',serif" fill="#1F6B52">∩</text>
+      </g>
+    </svg>
+    <h1>اشتراک، اجتماع و تفاضل مجموعه‌ها</h1>
+    <p class="sub">تعریف، شکل، مثال حل‌شده و آزمون</p>
+    <div class="designer">
+      <strong>طراح: نیلوفر محمودزاده</strong>
+      <small>دبیر ریاضی متوسطه</small>
+    </div>
+    <button class="btn primary" id="startBtn">شروع یادگیری</button>
+  </div>
+</section>
+
+<!-- ================= برنامه ================= -->
+<section id="app" class="screen">
+  <header class="topbar">
+    <div class="topbar-in">
+      <div class="brand">مجموعه‌ها</div>
+      <nav class="tabs" aria-label="بخش‌ها">
+        <button class="tab" data-tab="inter"><span class="math">∩</span>اشتراک</button>
+        <button class="tab" data-tab="union"><span class="math">∪</span>اجتماع</button>
+        <button class="tab" data-tab="diff"><span class="math">−</span>تفاضل</button>
+        <button class="tab" data-tab="quiz"><span class="math">?</span>آزمون</button>
+      </nav>
+    </div>
+  </header>
+  <main id="main"></main>
+  <footer>طراح: نیلوفر محمودزاده، دبیر ریاضی متوسطه</footer>
+</section>
+
+<script>
+/* ---------- ابزارهای کمکی ---------- */
+const toFa = n => String(n).replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+const m = s => `<span class="math" dir="ltr">${s}</span>`;
+const setStr = arr => arr.length ? '{' + arr.join(', ') + '}' : '∅';
+const chip = (t, c) => `<span class="chip ${c}">${t}</span>`;
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+
+/* ---------- مثال‌های نمودار ون ---------- */
+const PRESETS = [
+  {tag:'عددی',      U:[1,2,3,4,5,6,7,8,9],        A:[1,2,3,4,5], B:[4,5,6,7],     mode:'overlap'},
+  {tag:'مضرب‌ها',    U:[1,2,3,4,5,6,7,8,9,10],     A:[2,4,6,8],   B:[3,6,9],       mode:'overlap'},
+  {tag:'حرفی',      U:['a','b','c','d','e','f','g','h'], A:['a','b','c','d'], B:['c','d','e'], mode:'overlap'},
+  {tag:'جدا از هم',  U:[1,2,3,4,5,6,7],            A:[1,2,3],     B:[5,6],         mode:'disjoint'},
+  {tag:'زیرمجموعه',  U:[1,2,3,4,5,6],              A:[2,4],       B:[1,2,3,4],     mode:'subset'}
+];
+const GEO = {
+  overlap :{A:[185,150,105], B:[315,150,105], aOnly:[138,150,3], both:[250,150,2], bOnly:[362,150,3], la:[96,66],  lb:[404,66]},
+  disjoint:{A:[135,150,95],  B:[365,150,95],  aOnly:[135,150,3], both:null,        bOnly:[365,150,3], la:[72,62],  lb:[428,62]},
+  subset  :{A:[215,150,58],  B:[250,150,105], aOnly:null,        both:[215,150,2], bOnly:[316,150,2], la:[215,106],lb:[352,64]}
+};
+const OUT_SLOTS = [[62,62],[438,62],[62,238],[438,238],[250,30],[250,270]];
+
+function place(items, cx, cy, maxCols, dx = 30, dy = 30){
+  const n = items.length; if (!n) return [];
+  const cols = Math.min(maxCols, n), rows = Math.ceil(n / cols);
+  return items.map((it, i) => {
+    const r = Math.floor(i / cols), c = i % cols;
+    const inRow = (r === rows - 1) ? n - r * cols : cols;
+    return {it, x: cx + (c - (inRow - 1) / 2) * dx, y: cy + (r - (rows - 1) / 2) * dy};
+  });
+}
+
+function regionsOf(p){
+  const inA = x => p.A.includes(x), inB = x => p.B.includes(x);
+  return {
+    aOnly: p.U.filter(x => inA(x) && !inB(x)),
+    both : p.U.filter(x => inA(x) && inB(x)),
+    bOnly: p.U.filter(x => !inA(x) && inB(x)),
+    out  : p.U.filter(x => !inA(x) && !inB(x))
+  };
+}
+
+function vennSVG(pre, p, kind){
+  const g = GEO[p.mode], r = regionsOf(p);
+  const [ax, ay, ar] = g.A, [bx, by, br] = g.B;
+  const HL = '#9ADDBF';
+  const on = {
+    inter: {aOnly:false, both:true,  bOnly:false},
+    union: {aOnly:true,  both:true,  bOnly:true},
+    AB:    {aOnly:true,  both:false, bOnly:false},
+    BA:    {aOnly:false, both:false, bOnly:true}
+  }[kind];
+  let hl = '';
+  if (kind === 'inter') hl = `<circle cx="${bx}" cy="${by}" r="${br}" clip-path="url(#${pre}cA)" fill="${HL}"/>`;
+  if (kind === 'union') hl = `<circle cx="${ax}" cy="${ay}" r="${ar}" fill="${HL}"/><circle cx="${bx}" cy="${by}" r="${br}" fill="${HL}"/>`;
+  if (kind === 'AB')    hl = `<rect width="500" height="300" fill="${HL}" mask="url(#${pre}mAB)"/>`;
+  if (kind === 'BA')    hl = `<rect width="500" height="300" fill="${HL}" mask="url(#${pre}mBA)"/>`;
+
+  const txt = (pl, hot) => pl.map(o =>
+    `<text x="${o.x}" y="${o.y}" dy=".35em" text-anchor="middle" font-size="20" font-family="'STIX Two Text','Cambria Math','Times New Roman',serif" ${hot ? 'font-weight="700" fill="#1F3A5F"' : 'fill="#9C99BB"'}>${o.it}</text>`).join('');
+  let els = '';
+  if (g.aOnly) els += txt(place(r.aOnly, g.aOnly[0], g.aOnly[1], g.aOnly[2], 30), on.aOnly);
+  if (g.both)  els += txt(place(r.both,  g.both[0],  g.both[1],  g.both[2], 28),  on.both);
+  if (g.bOnly) els += txt(place(r.bOnly, g.bOnly[0], g.bOnly[1], g.bOnly[2], 30), on.bOnly);
+  els += txt(r.out.slice(0, 6).map((it, i) => ({it, x: OUT_SLOTS[i][0], y: OUT_SLOTS[i][1]})), false);
+
+  return `<svg viewBox="0 0 500 300" role="img" aria-label="نمودار ون">
+    <defs>
+      <clipPath id="${pre}cA"><circle cx="${ax}" cy="${ay}" r="${ar}"/></clipPath>
+      <mask id="${pre}mAB" maskUnits="userSpaceOnUse" x="0" y="0" width="500" height="300"><rect width="500" height="300" fill="#000"/><circle cx="${ax}" cy="${ay}" r="${ar}" fill="#fff"/><circle cx="${bx}" cy="${by}" r="${br}" fill="#000"/></mask>
+      <mask id="${pre}mBA" maskUnits="userSpaceOnUse" x="0" y="0" width="500" height="300"><rect width="500" height="300" fill="#000"/><circle cx="${bx}" cy="${by}" r="${br}" fill="#fff"/><circle cx="${ax}" cy="${ay}" r="${ar}" fill="#000"/></mask>
+    </defs>
+    <rect x="8" y="8" width="484" height="284" rx="22" fill="#fff" fill-opacity=".75" stroke="#BDB7E0" stroke-width="2"/>
+    <text x="24" y="34" font-size="18" font-style="italic" font-family="'STIX Two Text','Times New Roman',serif" fill="#8B87B5">U</text>
+    <circle cx="${ax}" cy="${ay}" r="${ar}" fill="#FFD9CB" fill-opacity=".4"/>
+    <circle cx="${bx}" cy="${by}" r="${br}" fill="#CDE6FB" fill-opacity=".4"/>
+    ${hl}
+    <circle cx="${ax}" cy="${ay}" r="${ar}" fill="none" stroke="#E0906F" stroke-width="2.6"/>
+    <circle cx="${bx}" cy="${by}" r="${br}" fill="none" stroke="#6AA7DB" stroke-width="2.6"/>
+    <text x="${g.la[0]}" y="${g.la[1]}" text-anchor="middle" font-size="26" font-style="italic" font-weight="700" font-family="'STIX Two Text','Times New Roman',serif" fill="#C0603F">A</text>
+    <text x="${g.lb[0]}" y="${g.lb[1]}" text-anchor="middle" font-size="26" font-style="italic" font-weight="700" font-family="'STIX Two Text','Times New Roman',serif" fill="#2D6CA3">B</text>
+    ${els}
+  </svg>`;
+}
+
+/* ---------- محتوای بخش‌ها ---------- */
+const OPS = {
+  inter: {
+    title:'اشتراک دو مجموعه', sym:'∩', bg:'var(--mint)', bd:'var(--mint-d)',
+    def:`<p>اشتراک دو مجموعه‌ی ${m('A')} و ${m('B')} مجموعه‌ای است که فقط <b>عضوهای مشترک</b> آن دو را دارد؛ یعنی عضوهایی که <b>هم</b> در ${m('A')} هستند <b>و هم</b> در ${m('B')}.</p>
+         <p>در نمودار ون، اشتراک همان ناحیه‌ی مشترک دو دایره است. اشتراک را با نماد ${m('∩')} نشان می‌دهیم.</p>`,
+    expr:'A ∩ B = { x | x ∈ A و x ∈ B }',
+    read:`بخوانید: «مجموعه‌ی همه‌ی ${m('x')}هایی که ${m('x')} عضو ${m('A')} باشد <b>و</b> ${m('x')} عضو ${m('B')} باشد.»`,
+    laws:[
+      ['جابه‌جایی', m('A ∩ B = B ∩ A')],
+      ['شرکت‌پذیری', m('(A ∩ B) ∩ C = A ∩ (B ∩ C)')],
+      ['اشتراک با خودش', m('A ∩ A = A')],
+      ['اشتراک با مجموعه‌ی تهی', m('A ∩ ∅ = ∅')],
+      ['اشتراک زیرمجموعه‌ی هر دو است', m('A ∩ B ⊆ A') + ' و ' + m('A ∩ B ⊆ B')],
+      ['اگر A زیرمجموعه‌ی B باشد', m('A ⊆ B ⇒ A ∩ B = A')],
+      ['اگر عضو مشترکی نباشد، مجموعه‌ها «جدا از هم»اند', m('A ∩ B = ∅')],
+      ['توزیع‌پذیری روی اجتماع', m('A ∩ (B ∪ C) = (A ∩ B) ∪ (A ∩ C)')]
+    ],
+    examples:(() => {
+      const A=[1,3,5,7,9,11], B=[3,6,9,12];
+      return [
+        {problem:`${m('A = '+setStr(A))} و ${m('B = '+setStr(B))}. ${m('A ∩ B')} را بنویسید.`,
+         steps:[
+          `عضوهای ${m('A')} را یکی‌یکی برمی‌داریم و می‌پرسیم: «این عدد در ${m('B')} هم هست؟»`,
+          A.map(x => chip(x + (B.includes(x) ? ' ✓' : ' ✗'), B.includes(x) ? 'yes' : 'no')).join(''),
+          `فقط ۳ و ۹ در هر دو مجموعه‌اند؛ پس ${m('A ∩ B = {3, 9}')}.`
+        ]},
+        {problem:`${m('A = {2, 4}')} و ${m('B = {1, 3, 5}')}. ${m('A ∩ B')} را بنویسید.`,
+         steps:[
+          `۲ در ${m('B')} نیست و ۴ هم در ${m('B')} نیست.`,
+          `عضو مشترکی وجود ندارد؛ پس ${m('A ∩ B = ∅')} و می‌گوییم ${m('A')} و ${m('B')} <b>جدا از هم</b> هستند.`
+        ]}
+      ];
+    })(),
+    next:'union'
+  },
+  union: {
+    title:'اجتماع دو مجموعه', sym:'∪', bg:'var(--peach)', bd:'var(--peach-d)',
+    def:`<p>اجتماع دو مجموعه‌ی ${m('A')} و ${m('B')} مجموعه‌ای است که شامل <b>همه‌ی عضوهای</b> ${m('A')} و ${m('B')} است؛ یعنی عضوهایی که <b>حداقل در یکی</b> از دو مجموعه باشند. عضو تکراری فقط یک بار نوشته می‌شود.</p>
+         <p>در نمودار ون، اجتماع هر دو دایره با هم است. اجتماع را با نماد ${m('∪')} نشان می‌دهیم.</p>`,
+    expr:'A ∪ B = { x | x ∈ A یا x ∈ B }',
+    read:`بخوانید: «مجموعه‌ی همه‌ی ${m('x')}هایی که ${m('x')} عضو ${m('A')} باشد <b>یا</b> ${m('x')} عضو ${m('B')} باشد.» (در ریاضی، «یا» یعنی حداقل یکی؛ هر دو هم می‌تواند باشد.)`,
+    laws:[
+      ['جابه‌جایی', m('A ∪ B = B ∪ A')],
+      ['شرکت‌پذیری', m('(A ∪ B) ∪ C = A ∪ (B ∪ C)')],
+      ['اجتماع با خودش', m('A ∪ A = A')],
+      ['اجتماع با مجموعه‌ی تهی', m('A ∪ ∅ = A')],
+      ['هر مجموعه زیرمجموعه‌ی اجتماع است', m('A ⊆ A ∪ B') + ' و ' + m('B ⊆ A ∪ B')],
+      ['اگر A زیرمجموعه‌ی B باشد', m('A ⊆ B ⇒ A ∪ B = B')],
+      ['توزیع‌پذیری روی اشتراک', m('A ∪ (B ∩ C) = (A ∪ B) ∩ (A ∪ C)')],
+      ['شمارش عضوها', m('n(A ∪ B) = n(A) + n(B) − n(A ∩ B)')]
+    ],
+    examples:[
+      {problem:`${m('A = {1, 2, 3, 4}')} و ${m('B = {3, 4, 5, 6, 7}')}. ${m('A ∪ B')} را بنویسید.`,
+       steps:[
+        `همه‌ی عضوهای ${m('A')} را می‌نویسیم: ${m('1, 2, 3, 4')}.`,
+        `از ${m('B')} فقط عضوهایی را اضافه می‌کنیم که هنوز ننوشته‌ایم: ${m('5, 6, 7')}. (۳ و ۴ تکراری‌اند.)`,
+        `${m('A ∪ B = {1, 2, 3, 4, 5, 6, 7}')}`,
+        `بررسی با فرمول: ${m('n(A ∪ B) = 4 + 5 − 2 = 7')} ✓`
+      ]},
+      {problem:`در کلاسی ۳۰ نفره، ۱۸ نفر فوتبال و ۱۵ نفر والیبال بازی می‌کنند و ۷ نفر هر دو ورزش را بازی می‌کنند. چند نفر حداقل یک ورزش را بازی می‌کنند؟`,
+       steps:[
+        `${m('n(A) = 18')} ، ${m('n(B) = 15')} ، ${m('n(A ∩ B) = 7')}`,
+        `${m('n(A ∪ B) = 18 + 15 − 7 = 26')}`,
+        `پس ۲۶ نفر حداقل یک ورزش را بازی می‌کنند و ${toFa(30 - 26)} نفر هیچ‌کدام را بازی نمی‌کنند.`
+      ]}
+    ],
+    next:'diff'
+  },
+  diff: {
+    title:'تفاضل دو مجموعه', sym:'−', bg:'var(--sky)', bd:'var(--sky-d)',
+    def:`<p>تفاضل ${m('A − B')} شامل عضوهایی از ${m('A')} است که <b>در ${m('B')} نیستند</b>؛ یعنی از ${m('A')}، هر چه با ${m('B')} مشترک است را کنار می‌گذاریم و بقیه را نگه می‌داریم.</p>
+         <p>در نمودار ون، تفاضل بخشی از دایره‌ی ${m('A')} است که با دایره‌ی ${m('B')} همپوشانی ندارد. توجه کنید که ${m('A − B')} و ${m('B − A')} معمولاً با هم فرق دارند.</p>`,
+    expr:'A − B = { x | x ∈ A و x ∉ B }',
+    read:`بخوانید: «مجموعه‌ی همه‌ی ${m('x')}هایی که ${m('x')} عضو ${m('A')} باشد <b>و</b> ${m('x')} عضو ${m('B')} <b>نباشد</b>.»`,
+    laws:[
+      ['جابه‌جایی ندارد (در حالت کلی)', m('A − B ≠ B − A')],
+      ['تفاضل مجموعه از خودش', m('A − A = ∅')],
+      ['تفاضل مجموعه‌ی تهی', m('A − ∅ = A') + ' و ' + m('∅ − A = ∅')],
+      ['اگر A زیرمجموعه‌ی B باشد', m('A ⊆ B ⇒ A − B = ∅')],
+      ['اگر A و B جدا از هم باشند', m('A ∩ B = ∅ ⇒ A − B = A')],
+      ['ارتباط با مکمل (' + m("B'") + ' یعنی عضوهای U که در B نیستند)', m("A − B = A ∩ B'")]
+    ],
+    examples:(() => {
+      const A=[1,2,3,4,5,6], B=[2,4,6,8];
+      return [
+        {problem:`${m('A = '+setStr(A))} و ${m('B = '+setStr(B))}. ${m('A − B')} و ${m('B − A')} را بنویسید.`,
+         steps:[
+          `برای ${m('A − B')}: هر عضو ${m('A')} را بررسی می‌کنیم؛ اگر در ${m('B')} نبود نگهش می‌داریم.`,
+          A.map(x => chip(x + (B.includes(x) ? ' حذف' : ' می‌ماند'), B.includes(x) ? 'no' : 'yes')).join(''),
+          `${m('A − B = {1, 3, 5}')}`,
+          `برای ${m('B − A')}: از ${m('B')} عضوهایی را نگه می‌داریم که در ${m('A')} نیستند؛ فقط ۸. پس ${m('B − A = {8}')}.`,
+          `${m('A − B')} با ${m('B − A')} برابر نیست؛ ترتیب مهم است.`
+        ]},
+        {problem:`${m('A = {a, b, c, d}')} و ${m('B = {a, b, c, d, e}')}. ${m('A − B')} و ${m('B − A')} را بنویسید.`,
+         steps:[
+          `همه‌ی عضوهای ${m('A')} در ${m('B')} هستند؛ پس چیزی باقی نمی‌ماند: ${m('A − B = ∅')}.`,
+          `در ${m('B')} فقط ${m('e')} در ${m('A')} نیست: ${m('B − A = {e}')}.`
+        ]}
+      ];
+    })(),
+    next:'quiz'
+  }
+};
+const ORDER = ['inter', 'union', 'diff', 'quiz'];
+const NAMES = {inter:'اشتراک', union:'اجتماع', diff:'تفاضل', quiz:'آزمون'};
+const exState = {inter:{p:0}, union:{p:0}, diff:{p:0, which:'AB'}};
+
+function note(op, kind, p, r){
+  const nA = p.A.length, nB = p.B.length, nI = r.both.length;
+  let out = [];
+  if (op === 'inter'){
+    if (!nI) out.push(`${m('A')} و ${m('B')} هیچ عضو مشترکی ندارند، پس اشتراکشان ${m('∅')} است و می‌گوییم این دو مجموعه <b>جدا از هم</b> هستند.`);
+    else if (p.mode === 'subset') out.push(`چون ${m('A ⊂ B')} است، اشتراک دو مجموعه با ${m('A')} برابر می‌شود.`);
+    else out.push(`عضوهای ناحیه‌ی مشترک دو دایره، همان اشتراک‌اند. اگر جای ${m('A')} و ${m('B')} را عوض کنیم نتیجه تغییر نمی‌کند: ${m('B ∩ A = A ∩ B')}.`);
+  }
+  if (op === 'union'){
+    if (p.mode === 'subset') out.push(`چون ${m('A ⊂ B')} است، اجتماع دو مجموعه با ${m('B')} برابر می‌شود.`);
+    if (p.mode === 'disjoint') out.push(`چون ${m('A')} و ${m('B')} عضو مشترک ندارند، فقط تعداد عضوها جمع می‌شود.`);
+    out.push(m(`n(A ∪ B) = n(A) + n(B) − n(A ∩ B) = ${nA} + ${nB} − ${nI} = ${nA + nB - nI}`));
+  }
+  if (op === 'diff'){
+    const X = kind === 'AB' ? 'A' : 'B', Y = kind === 'AB' ? 'B' : 'A';
+    const xOnly = kind === 'AB' ? r.aOnly : r.bOnly;
+    if (!xOnly.length) out.push(`همه‌ی عضوهای ${m(X)} در ${m(Y)} هم هستند، پس چیزی باقی نمی‌ماند: ${m(X + ' − ' + Y + ' = ∅')}.`);
+    else if (!nI) out.push(`چون ${m('A')} و ${m('B')} عضو مشترک ندارند، هیچ عضوی از ${m(X)} حذف نمی‌شود: ${m(X + ' − ' + Y + ' = ' + X)}.`);
+    else out.push(`عضوهای مشترک (${toFa(nI)} عضو) از ${m(X)} کنار گذاشته می‌شوند و بقیه می‌مانند.`);
+    const other = kind === 'AB' ? r.bOnly : r.aOnly;
+    out.push(`برای مقایسه: ${m(Y + ' − ' + X + ' = ' + setStr(other))}`);
+  }
+  return out.map(s => `<p>${s}</p>`).join('');
+}
+
+function renderOpPanel(op){
+  const o = OPS[op];
+  const idx = ORDER.indexOf(op);
+  const prev = idx > 0 ? ORDER[idx - 1] : null;
+  const nextName = NAMES[o.next];
+  return `
+  <div class="op-head">
+    <div class="badge" style="background:${o.bg};border-color:${o.bd}">${o.sym}</div>
+    <h2>${o.title}</h2>
+  </div>
+
+  <div class="card c-def"><h3>تعریف</h3>${o.def}</div>
+
+  <div class="card c-math"><h3>تعریف به زبان ریاضی</h3>
+    <div class="mathline">${o.expr}</div>
+    <p>${o.read}</p>
+    <div class="legend">
+      <span>${m('∈')} <b>عضو است</b></span><span>${m('∉')} <b>عضو نیست</b></span>
+      <span>${m('|')} <b>به طوری که</b></span><span>${m('∅')} <b>مجموعه‌ی تهی</b></span>
+    </div>
+  </div>
+
+  <div class="card c-play"><h3>خودت امتحان کن</h3>
+    <p>یک مثال انتخاب کن تا ناحیه‌ی مورد نظر روی نمودار ون رنگی شود. عددهای پررنگ، عضوهای جواب‌اند.</p>
+    <div class="chips-row" id="pre-${op}"></div>
+    ${op === 'diff' ? `<div class="chips-row" id="wh-${op}"></div>` : ''}
+    <div class="venn-wrap" id="venn-${op}"></div>
+    <div class="setrow" id="sets-${op}"></div>
+    <div class="result" id="res-${op}"></div>
+    <div class="note" id="note-${op}"></div>
+  </div>
+
+  <div class="card c-laws"><h3>قوانین و نکته‌ها</h3>
+    <ul class="laws">${o.laws.map(l => `<li><span class="lbl">${l[0]}</span><span class="eq">${l[1]}</span></li>`).join('')}</ul>
+  </div>
+
+  <div class="card c-ex"><h3>مثال حل‌شده</h3>
+    ${o.examples.map(e => `
+      <div class="ex">
+        <div class="problem">${e.problem}</div>
+        <ol class="steps">${e.steps.map(s => `<li>${s}</li>`).join('')}</ol>
+      </div>`).join('')}
+  </div>
+
+  <div class="pager">
+    ${prev ? `<button class="btn soft" data-go="${prev}">بخش قبل: ${NAMES[prev]}</button>` : '<span></span>'}
+    <button class="btn primary" data-go="${o.next}">بخش بعد: ${nextName}</button>
+  </div>`;
+}
+
+function drawExplorer(op){
+  const st = exState[op], p = PRESETS[st.p], r = regionsOf(p);
+  const kind = op === 'inter' ? 'inter' : op === 'union' ? 'union' : st.which;
+  document.getElementById('pre-' + op).innerHTML = PRESETS.map((x, i) =>
+    `<button class="pill ${i === st.p ? 'active' : ''}" data-op="${op}" data-p="${i}">مثال ${toFa(i + 1)}: ${x.tag}</button>`).join('');
+  if (op === 'diff'){
+    document.getElementById('wh-' + op).innerHTML = [['AB','A − B'],['BA','B − A']].map(([k, t]) =>
+      `<button class="pill ${st.which === k ? 'active' : ''}" data-op="diff" data-w="${k}">${m(t)}</button>`).join('');
+  }
+  document.getElementById('venn-' + op).innerHTML = vennSVG('v' + op, p, kind);
+  document.getElementById('sets-' + op).innerHTML =
+    `<span class="setbox math">A = ${setStr(p.A)}</span><span class="setbox math">B = ${setStr(p.B)}</span><span class="setbox math">U = ${setStr(p.U)}</span>`;
+  const res = {inter:r.both, union:p.U.filter(x => !r.out.includes(x)), AB:r.aOnly, BA:r.bOnly}[kind];
+  const expr = {inter:'A ∩ B', union:'A ∪ B', AB:'A − B', BA:'B − A'}[kind];
+  document.getElementById('res-' + op).textContent = `${expr} = ${setStr(res)}`;
+  document.getElementById('note-' + op).innerHTML = note(op, kind, p, r);
+}
+
+/* ---------- آزمون ---------- */
+const QUIZ = [
+  {q:`${m('A = {1, 2, 3, 4, 5}')} و ${m('B = {3, 4, 5, 6, 7}')}. حاصل ${m('A ∩ B')} کدام است؟`,
+   opts:[m('{3, 4, 5}'), m('{1, 2, 3, 4, 5, 6, 7}'), m('{1, 2, 6, 7}'), m('{3, 4}')], a:0,
+   why:`عضوهایی را می‌خواهیم که در هر دو مجموعه‌اند: ${m('3')} و ${m('4')} و ${m('5')}.`},
+  {q:`${m('A = {2, 4, 6}')} و ${m('B = {1, 2, 3}')}. حاصل ${m('A ∪ B')} کدام است؟`,
+   opts:[m('{2}'), m('{1, 2, 3, 4, 6}'), m('{1, 3, 4, 6}'), m('{2, 4, 6}')], a:1,
+   why:`همه‌ی عضوها را می‌نویسیم و عضو تکراری (${m('2')}) را فقط یک بار می‌آوریم: ${m('{1, 2, 3, 4, 6}')}.`},
+  {q:`${m('A = {1, 2, 3, 4, 5, 6}')} و ${m('B = {2, 4, 8}')}. حاصل ${m('A − B')} کدام است؟`,
+   opts:[m('{8}'), m('{2, 4}'), m('{1, 3, 5, 6}'), m('{1, 3, 5, 6, 8}')], a:2,
+   why:`از ${m('A')} عضوهای ${m('2')} و ${m('4')} را که در ${m('B')} هستند کنار می‌گذاریم. عدد ${m('8')} در ${m('A')} نیست؛ پس در جواب نمی‌آید. (${m('{8}')} جواب ${m('B − A')} است.)`},
+  {q:`${m('A = {a, b, c}')} و ${m('B = {d, e}')}. حاصل ${m('A ∩ B')} کدام است؟`,
+   opts:[m('{a, b, c, d, e}'), m('{a, b, c}'), m('∅'), m('{d, e}')], a:2,
+   why:`این دو مجموعه عضو مشترک ندارند؛ پس اشتراکشان مجموعه‌ی تهی است.`},
+  {q:`${m('A')} اولین چهار عدد زوج طبیعی است: ${m('A = {2, 4, 6, 8}')}، و ${m('B')} مجموعه‌ی مقسوم‌علیه‌های ۱۲ است: ${m('B = {1, 2, 3, 4, 6, 12}')}. حاصل ${m('A ∩ B')} کدام است؟`,
+   opts:[m('{2, 6}'), m('{2, 4, 6, 8}'), m('{2, 4, 6}'), m('{1, 2, 3, 4, 6, 8, 12}')], a:2,
+   why:`عددهای ${m('2')} و ${m('4')} و ${m('6')} هم زوج‌اند و هم مقسوم‌علیه ۱۲. عدد ${m('8')} مقسوم‌علیه ۱۲ نیست.`},
+  {q:`اگر ${m('n(A) = 12')} و ${m('n(B) = 9')} و ${m('n(A ∩ B) = 4')} باشد، ${m('n(A ∪ B)')} چند است؟`,
+   opts:[toFa(21), toFa(17), toFa(25), toFa(13)], a:1,
+   why:`${m('n(A ∪ B) = n(A) + n(B) − n(A ∩ B) = 12 + 9 − 4 = 17')}. عضوهای مشترک دو بار شمرده شده‌اند و باید یک بار کم شوند.`},
+  {q:`در کلاسی ۳۵ نفره، ۲۰ نفر شنا و ۱۸ نفر دو و میدانی بلدند و ۵ نفر هر دو را بلدند. چند نفر حداقل یکی از این دو ورزش را بلدند؟`,
+   opts:[toFa(38) + ' نفر', toFa(33) + ' نفر', toFa(43) + ' نفر', toFa(13) + ' نفر'], a:1,
+   why:`${m('20 + 18 − 5 = 33')}. پس ۳۳ نفر حداقل یکی را بلدند و ${toFa(2)} نفر هیچ‌کدام را بلد نیستند.`},
+  {q:`کدام تساوی برای هر دو مجموعه‌ی ${m('A')} و ${m('B')} همیشه درست است؟`,
+   opts:[m('A ∩ B = B ∩ A'), m('A − B = B − A'), m('A ∪ ∅ = ∅'), m('A ∩ ∅ = A')], a:0,
+   why:`اشتراک خاصیت جابه‌جایی دارد. اما تفاضل جابه‌جایی ندارد، ${m('A ∪ ∅ = A')} است و ${m('A ∩ ∅ = ∅')} است.`},
+  {q:`اگر ${m('A ⊆ B')} باشد، ${m('A − B')} برابر کدام است؟`,
+   opts:[m('∅'), m('A'), m('B'), m('B − A')], a:0,
+   why:`همه‌ی عضوهای ${m('A')} در ${m('B')} هستند و با کنار گذاشتن آن‌ها چیزی از ${m('A')} نمی‌ماند.`},
+  {q:`حاصل ${m('(A − B) ∪ (A ∩ B)')} برابر کدام است؟`,
+   opts:[m('B'), m('A ∪ B'), m('∅'), m('A')], a:3,
+   why:`عضوهای ${m('A')} دو دسته‌اند: آن‌هایی که در ${m('B')} نیستند (${m('A − B')}) و آن‌هایی که در ${m('B')} هم هستند (${m('A ∩ B')}). اجتماع این دو دسته، کل ${m('A')} است.`}
+];
+const LETTERS = ['الف', 'ب', 'ج', 'د'];
+let qz = {i:0, score:0, log:[], cur:null, sel:null, done:false, submitted:false, started:false};
+
+function startQuiz(){
+  qz = {i:0, score:0, log:[], cur:null, sel:null, done:false, submitted:false, started:true};
+  renderQuiz();
+}
+
+function renderQuiz(){
+  const box = document.getElementById('quizBox');
+  if (qz.done){
+    const s = qz.score, t = QUIZ.length;
+    const msg = s >= 9 ? 'عالی بود! به مفهوم اشتراک، اجتماع و تفاضل کاملاً مسلطی.' :
+                s >= 7 ? 'آفرین! فقط چند نکته‌ی کوچک مانده است.' :
+                s >= 5 ? 'خوب بود. پاسخ‌های اشتباه را مرور کن و دوباره امتحان بده.' :
+                         'نگران نباش. بخش‌های درس را یک بار دیگر مرور کن و دوباره امتحان بده.';
+    box.innerHTML = `
+      <div class="q-card">
+        <div class="score-big">${toFa(s)} از ${toFa(t)}</div>
+        <p style="text-align:center;margin:0">${msg}</p>
+      </div>
+      <div class="card c-laws"><h3>مرور پاسخ‌ها</h3>
+        <ul class="review">${qz.log.map((l, i) => `
+          <li class="${l.ok ? 'r-ok' : 'r-bad'}">
+            <div><b>سؤال ${toFa(i + 1)}</b> ${l.ok ? '✓ درست' : '✗ نادرست'}</div>
+            <div>${QUIZ[l.qi].q}</div>
+            <div>پاسخ درست: ${QUIZ[l.qi].opts[QUIZ[l.qi].a]}</div>
+          </li>`).join('')}
+        </ul>
+      </div>
+      <div class="pager">
+        <button class="btn soft" data-go="inter">مرور درس</button>
+        <button class="btn primary" id="retryBtn">آزمون دوباره</button>
+      </div>`;
+    document.getElementById('retryBtn').onclick = startQuiz;
+    return;
+  }
+  const q = QUIZ[qz.i];
+  if (!qz.cur) qz.cur = shuffle(q.opts.map((o, idx) => ({o, idx})));
+  const pct = (qz.i / QUIZ.length) * 100;
+  box.innerHTML = `
+    <div class="q-card">
+      <div class="q-meta"><span>سؤال ${toFa(qz.i + 1)} از ${toFa(QUIZ.length)}</span><span>امتیاز: ${toFa(qz.score)}</span></div>
+      <div class="progress"><i style="width:${pct}%"></i></div>
+      <div class="q-text">${q.q}</div>
+      <div id="opts">${qz.cur.map((c, k) => `
+        <button class="opt" data-k="${k}"><span class="lt">${LETTERS[k]}</span><span>${c.o}</span><span class="tag"></span></button>`).join('')}
+      </div>
+      <div id="fb"></div>
+      <div class="pager"><span></span><button class="btn primary" id="actBtn" disabled>ثبت پاسخ</button></div>
+    </div>`;
+  const opts = [...document.querySelectorAll('#opts .opt')];
+  const act = document.getElementById('actBtn');
+  opts.forEach(b => b.onclick = () => {
+    if (qz.submitted) return;
+    qz.sel = +b.dataset.k;
+    opts.forEach(x => x.classList.toggle('sel', x === b));
+    act.disabled = false;
+  });
+  act.onclick = () => {
+    if (!qz.submitted){
+      qz.submitted = true;
+      const chosen = qz.cur[qz.sel], ok = chosen.idx === q.a;
+      if (ok) qz.score++;
+      qz.log.push({qi:qz.i, ok});
+      opts.forEach((b, k) => {
+        b.disabled = true; b.classList.remove('sel');
+        if (qz.cur[k].idx === q.a){ b.classList.add('correct'); b.querySelector('.tag').textContent = '✓ پاسخ درست'; }
+        else if (k === qz.sel){ b.classList.add('wrong'); b.querySelector('.tag').textContent = '✗ پاسخ شما'; }
+      });
+      document.getElementById('fb').innerHTML = `
+        <div class="feedback ${ok ? 'ok' : 'bad'}">
+          <b>${ok ? 'آفرین، درست جواب دادی!' : 'پاسخ شما درست نبود.'}</b>
+          <div class="ans">پاسخ درست: ${q.opts[q.a]}</div>
+          <div>${q.why}</div>
+        </div>`;
+      act.textContent = qz.i === QUIZ.length - 1 ? 'دیدن نتیجه' : 'سؤال بعدی';
+    } else {
+      if (qz.i === QUIZ.length - 1) qz.done = true;
+      else { qz.i++; qz.cur = null; qz.sel = null; qz.submitted = false; }
+      renderQuiz();
+      window.scrollTo({top:0, behavior:'smooth'});
+    }
+  };
+}
+
+/* ---------- ساخت صفحه ---------- */
+const main = document.getElementById('main');
+main.innerHTML =
+  ['inter', 'union', 'diff'].map(op => `<section class="panel" id="panel-${op}">${renderOpPanel(op)}</section>`).join('') +
+  `<section class="panel" id="panel-quiz">
+     <div class="op-head"><div class="badge" style="background:var(--lav);border-color:var(--lav-d)">?</div><h2>آزمون</h2></div>
+     <p>برای هر سؤال یک گزینه را انتخاب کن و «ثبت پاسخ» را بزن. بعد از ثبت، پاسخ درست و توضیح آن نمایش داده می‌شود.</p>
+     <div id="quizBox"></div>
+   </section>`;
+
+function showTab(id){
+  document.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + id));
+  document.querySelectorAll('.tab').forEach(t => {
+    const on = t.dataset.tab === id;
+    t.classList.toggle('active', on);
+    if (on) t.setAttribute('aria-current', 'page'); else t.removeAttribute('aria-current');
+  });
+  if (id === 'quiz' && !qz.started) startQuiz();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+document.addEventListener('click', e => {
+  const go = e.target.closest('[data-go]');
+  if (go){ showTab(go.dataset.go); return; }
+  const tab = e.target.closest('.tab');
+  if (tab){ showTab(tab.dataset.tab); return; }
+  const pre = e.target.closest('[data-p]');
+  if (pre){ exState[pre.dataset.op].p = +pre.dataset.p; drawExplorer(pre.dataset.op); return; }
+  const wh = e.target.closest('[data-w]');
+  if (wh){ exState.diff.which = wh.dataset.w; drawExplorer('diff'); }
+});
+
+document.getElementById('startBtn').onclick = () => {
+  document.getElementById('intro').classList.remove('active');
+  document.getElementById('app').classList.add('active');
+  showTab('inter');
+};
+
+['inter', 'union', 'diff'].forEach(drawExplorer);
+</script>
+</body>
+</html>
